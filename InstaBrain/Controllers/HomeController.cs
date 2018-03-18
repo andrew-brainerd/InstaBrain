@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using InstaBrain.Models;
 using System.Net.Http;
+using System;
+using System.Threading.Tasks;
 
 namespace InstaBrain.Controllers
 {
@@ -14,7 +16,7 @@ namespace InstaBrain.Controllers
         private static string redirectUrl = "http://localhost:57300/Home/Authorize";
         private static string requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token";
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var sessionToken = HttpContext.Session.GetString("AccessToken");
 
@@ -22,15 +24,21 @@ namespace InstaBrain.Controllers
             {
                 Response.Redirect("/Home/Authorize");
             }
+            else
+            {
+                var users = new UsersClient(sessionToken);
 
+                var myself = await users.GetSelf();
+                ViewData["me"] = myself;
+            }
             return View();
         }
 
         public IActionResult Authorize(string access_token)
         {
-            var doneTriedToAuthorizeBefore = HttpContext.Session.GetString("TriedToAuthBefore");
+            var alreadyBeenHere = HttpContext.Session.GetString("TriedToAuthBefore");
 
-            if (doneTriedToAuthorizeBefore == null)
+            if (alreadyBeenHere == null)
             {
                 HttpContext.Session.SetString("TriedToAuthBefore", "totes");
                 Response.Redirect(requestUrl);
