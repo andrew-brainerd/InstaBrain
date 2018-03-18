@@ -13,18 +13,41 @@ namespace InstaBrain.Controllers
     public class HomeController : Controller
     {
         public static HttpClient _client;
+        private static string baseUrl = "https://api.instagram.com";
+        private static string authEndpoint = "/oauth/authorize/";
+        private static string tokenEndpoint = "/oauth/access_token/";
+        private static string clientId = "a70d888fa7114376a251d49fce2f2241";
+        private static string clientSecret = "21858dd90eb6415cb531af9c4b40b23f ";
+        private static string redirectUrl = "http://localhost:57300/About";
+        private static string requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token";
 
         public IActionResult Index()
         {
 
-            GetAuthorizedClient();
+            //GetAuthorizedClient();
 
             return View();
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About(string code, string token)
         {
             ViewData["Message"] = "Your application description page.";
+
+            string url = baseUrl + tokenEndpoint + "?client_id=" + clientId + "&client_secret=" + clientSecret + "&grant_type=authorization_code&redirect_uri=" + redirectUrl + "&code=" + code;
+            Debug.WriteLine("CODE: " + code);
+            //Response.Redirect(url);
+
+            _client = new HttpClient();
+
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Get
+            };
+
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            Debug.WriteLine("RESPONSE: " + response);
 
             return View();
         }
@@ -43,12 +66,6 @@ namespace InstaBrain.Controllers
 
         public static async void GetAuthorizedClient()
         {
-            var baseUrl = "https://api.instagram.com";
-            var authEndpoint = "/oauth/authorize/";
-            var clientId = "a70d888fa7114376a251d49fce2f2241";
-            var redirectUrl = "http://localhost:57300/About";
-            var requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token";
-
             Debug.WriteLine("Request Url: " + requestUrl);
 
             _client = new HttpClient();
