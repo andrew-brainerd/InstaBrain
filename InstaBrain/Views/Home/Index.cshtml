@@ -2,6 +2,21 @@
     ViewData["Title"] = "Home Page";
 }
 
+<h3>Access Token: @ViewData["AccessToken"]</h3>
+
 <div id="content">
-    <a href="https://api.instagram.com/oauth/authorize/?client_id=a70d888fa7114376a251d49fce2f2241&redirect_uri=http://localhost:57300/Home/About&response_type=code">Authorize</a>
+    <a href="@ViewData["AuthorizationEndpoint"]">Authorize with Token</a>
 </div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var fragment = location.hash;
+
+            if (fragment.indexOf("#") > -1) {
+                console.log('/Home/About?' + fragment.replace(/^.*#/, ''));
+                window.location.replace('/Home' + '?' + fragment.replace(/^.*#/, ''));
+            }
+        });
+    </script>
+}
