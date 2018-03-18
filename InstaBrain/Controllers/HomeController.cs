@@ -16,19 +16,10 @@ namespace InstaBrain.Controllers
 
         public IActionResult Index()
         {
-            var firstAuth = HttpContext.Session.GetString("first");
-            if (firstAuth == null)
-            {
-                HttpContext.Session.GetString("first");
-            }
             var sessionToken = HttpContext.Session.GetString("AccessToken");
 
             if (sessionToken == null)
             {
-                ViewData["message"] = "Session Token is null";
-
-                System.Threading.Thread.Sleep(5000);
-
                 Response.Redirect("/Home/Authorize");
             }
 
@@ -41,20 +32,14 @@ namespace InstaBrain.Controllers
 
             if (doneTriedToAuthorizeBefore == null)
             {
-                ViewData["message"] += " | First time trying to authorize | ";
                 HttpContext.Session.SetString("TriedToAuthBefore", "totes");
-
                 Response.Redirect(requestUrl);
-            }
-            else
-            {
-                ViewData["message"] += " | Second time trying to authorize | ";
             }
 
             if (access_token != null)
             {
-                ViewData["message"] += " | Access Token: " + access_token + " | ";
                 HttpContext.Session.SetString("AccessToken", access_token);
+                Response.Redirect("/Home");
             }
 
             return View();
