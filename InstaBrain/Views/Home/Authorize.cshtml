@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "About";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["message"]</h3>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var fragment = location.hash;
+
+            if (fragment.indexOf("#") > -1) {
+                console.log('/Home/Authorize?' + fragment.replace(/^.*#/, ''));
+                window.location.replace('/Home/Authorize' + '?' + fragment.replace(/^.*#/, ''));
+            }
+        });
+    </script>
+}
