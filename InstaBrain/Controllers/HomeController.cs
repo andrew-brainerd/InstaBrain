@@ -28,8 +28,9 @@ namespace InstaBrain.Controllers
             {
                 var users = new UsersClient(sessionToken);
 
-                var myself = await users.GetSelf();
-                ViewData["me"] = myself;
+                ViewData["me"] = await users.GetSelf();
+                ViewData["userById"] = await users.GetUserById("15954374");
+                ViewData["selfRecent"] = await users.GetSelfRecentMedia();
             }
             return View();
         }
