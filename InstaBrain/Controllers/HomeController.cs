@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using InstaBrain.Models;
 using System.Net.Http;
 
@@ -7,31 +8,54 @@ namespace InstaBrain.Controllers
 {
     public class HomeController : Controller
     {
-        public static HttpClient _client;
         private static string baseUrl = "https://api.instagram.com";
         private static string authEndpoint = "/oauth/authorize/";
         private static string clientId = "a70d888fa7114376a251d49fce2f2241";
-        private static string redirectUrl = "http://localhost:57300/Home";
+        private static string redirectUrl = "http://localhost:57300/Home/Authorize";
         private static string requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token";
 
-        public IActionResult Index(string access_token)
+        public IActionResult Index()
         {
-            ViewData["AuthorizationEndpoint"] = requestUrl;
-            ViewData["AccessToken"] = access_token;
+            var firstAuth = HttpContext.Session.GetString("first");
+            if (firstAuth == null)
+            {
+                HttpContext.Session.GetString("first");
+            }
+            var sessionToken = HttpContext.Session.GetString("AccessToken");
+
+            if (sessionToken == null)
+            {
+                ViewData["message"] = "Session Token is null";
+
+                System.Threading.Thread.Sleep(5000);
+
+                Response.Redirect("/Home/Authorize");
+            }
 
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult Authorize(string access_token)
         {
-            ViewData["Message"] = "Your application description page.";
+            var doneTriedToAuthorizeBefore = HttpContext.Session.GetString("TriedToAuthBefore");
 
-            return View();
-        }
+            if (doneTriedToAuthorizeBefore == null)
+            {
+                ViewData["message"] += " | First time trying to authorize | ";
+                HttpContext.Session.SetString("TriedToAuthBefore", "totes");
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
+                Response.Redirect(requestUrl);
+            }
+            else
+            {
+                ViewData["message"] += " | Second time trying to authorize | ";
+            }
+
+            if (access_token != null)
+            {
+                ViewData["message"] += " | Access Token: " + access_token + " | ";
+                HttpContext.Session.SetString("AccessToken", access_token);
+            }
 
             return View();
         }

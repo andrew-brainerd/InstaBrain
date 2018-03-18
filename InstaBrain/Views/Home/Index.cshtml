@@ -5,18 +5,6 @@
 <h3>Access Token: @ViewData["AccessToken"]</h3>
 
 <div id="content">
-    <a href="@ViewData["AuthorizationEndpoint"]">Authorize with Token</a>
+    <a href="@ViewData["AuthorizationUrl"]">Authorize with Token</a>
+    <h3>@ViewData["message"]</h3>
 </div>
-
-@section scripts {
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var fragment = location.hash;
-
-            if (fragment.indexOf("#") > -1) {
-                console.log('/Home/About?' + fragment.replace(/^.*#/, ''));
-                window.location.replace('/Home' + '?' + fragment.replace(/^.*#/, ''));
-            }
-        });
-    </script>
-}
