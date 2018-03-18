@@ -14,7 +14,7 @@ namespace InstaBrain.Controllers
         private static string authEndpoint = "/oauth/authorize/";
         private static string clientId = "a70d888fa7114376a251d49fce2f2241";
         private static string redirectUrl = "http://localhost:57300/Home/Authorize";
-        private static string requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token";
+        private static string requestUrl = baseUrl + authEndpoint + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=token&scope=follower_list";
 
         public async Task<IActionResult> Index()
         {
@@ -28,8 +28,13 @@ namespace InstaBrain.Controllers
             {
                 var users = new UsersClient(sessionToken);
 
-                var myself = await users.GetSelf();
-                ViewData["me"] = myself;
+                ViewData["me"] = await users.GetSelf();
+                ViewData["userById"] = await users.GetUserById("15954374");
+                ViewData["selfRecent"] = await users.GetSelfRecentMedia();
+                ViewData["userRecent"] = await users.GetUserRecentMedia("15954374");
+                ViewData["selfLiked"] = await users.GetSelfLikedMedia();
+                ViewData["selfFollows"] = await users.GetSelfFollows();
+                ViewData["selfFollwedBy"] = await users.GetSelfFollowedBy();
             }
             return View();
         }
